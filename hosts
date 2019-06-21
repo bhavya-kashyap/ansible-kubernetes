@@ -1,0 +1,7 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.43.60 ansible.com
+192.168.43.65 master.com
+192.168.43.71 node1.com
+192.168.43.72 node2.com

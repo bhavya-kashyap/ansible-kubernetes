@@ -1,0 +1,62 @@
+- hosts: nodes
+  tasks:
+   - name: Disable SElinux
+     command: setenforce 0
+     command: sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+   - name: Turn swap off
+     command: swapoff -a
+
+   - name: Remove swapfile from /etc/fstab
+     mount:
+      name: swap
+      fstype: swap
+      state: absent
+
+   - name: Enable br_netfilter Kernel Module
+     command: modprobe br_netfilter
+     command: echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+   - name: Add repository to yum
+     yum_repository:
+       name: Kubernetes
+       description: Kubernetes
+       baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+       enabled: 1
+       gpgcheck: 1
+       repo_gpgcheck: 1
+       gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+   - name: Add kubernetes repository
+     command: yum repolist -y
+
+   - name: Install the kubernetes package kubeadm
+     yum:
+       name: kubeadm
+       state: present
+
+   - name: Install the kubernetes package kubelet
+     yum:
+       name: kubelet
+       state: present
+
+   - name: Install the kubernetes package kubectl
+     yum:
+       name: kubectl
+       state: present
+
+   - name: Start service kubelet
+     systemd:
+       name: kubelet
+       state: started
+       enabled: yes
+
+   - name: Change the cgroup-driver
+     command: echo "cgroup-driver=cgroupfs" > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+   - name: Reload the systemd system and restart the kubelet service
+     systemd:
+       name: kubelet
+       daemon_reload: yes
+       state: restarted
+       enabled: yes
