@@ -1,0 +1,11 @@
+[nodes]
+master.com
+node1.com
+node2.com
+
+[masters]
+master.com
+
+[self]
+ansible.com
+
